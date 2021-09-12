@@ -14,15 +14,19 @@ namespace Condominio.Application.Tests
     public class CondominioServiceTests
     {
         private readonly ICondominioService condominioService;
+        private readonly Mock<IValidacaoCondominioParametroService> validacaoCondominioParametroServiceMock;
         private readonly Mock<ILogCondominioService> logCondominioServiceMock;
         private readonly Mock<ICondominioReadAdapter> condominioReadAdapterMock;
         public CondominioServiceTests()
         {
             logCondominioServiceMock = new Mock<ILogCondominioService>();
             condominioReadAdapterMock = new Mock<ICondominioReadAdapter>();
+            validacaoCondominioParametroServiceMock = new Mock<IValidacaoCondominioParametroService>();
+
             condominioService = new CondominioService(
                 condominioReadAdapterMock.Object,
                 logCondominioServiceMock.Object,
+                validacaoCondominioParametroServiceMock.Object,
                 new LoggerFactory()
             );
         }
@@ -32,7 +36,7 @@ namespace Condominio.Application.Tests
         public async Task BuscarCondominioAsync_Sucesso()
         {
             //Arange = inicializacao de variaveis 
-            var cpfCnpj = 99999999999999;
+            var cpfCnpj = "99999999999999";
             var parametroCondominioMock = new CondominioParametro()
             {
                 CpfCnpj = cpfCnpj
@@ -55,7 +59,12 @@ namespace Condominio.Application.Tests
                 Numero = "121A",
                 Bairro = "Citrolandia",
                 Cidade = "Betim",
-                Estado = Estado.MG,
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
                 Pais = "Brasil"
             };
 
@@ -70,15 +79,28 @@ namespace Condominio.Application.Tests
                 Numero = "121A",
                 Bairro = "Citrolandia",
                 Cidade = "Betim",
-                Estado = Estado.MG,
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
                 Pais = "Brasil"
             };
             //Act = invocar os metodos 
+            validacaoCondominioParametroServiceMock.Setup(v => v.ValidacaoCondominioParametro(It.IsAny<CondominioParametro>()))
+                .Callback<CondominioParametro>((condominioParametroCallback) =>
+                {
+                    Assert.Equal(condominioParametroCallback.CpfCnpj, parametroCondominioEsperado.CpfCnpj);
+                });
+                
+
             condominioReadAdapterMock.Setup(c => c.BuscarMoradiaCondominioAsync(It.IsAny<CondominioParametro>()))
                 .Callback<CondominioParametro>((condominioParametroCallback) =>
                 {
                     Assert.Equal(condominioParametroCallback.CpfCnpj, parametroCondominioEsperado.CpfCnpj);
                 });
+
             condominioReadAdapterMock.Setup(c => c.BuscarMoradiaCondominioAsync(It.IsAny<CondominioParametro>()))
             .ReturnsAsync(condominioResultadoMock);
 
@@ -98,7 +120,9 @@ namespace Condominio.Application.Tests
             Assert.Equal(condominioResultadoEsperado.Numero, condominioResultado.Numero);
             Assert.Equal(condominioResultadoEsperado.Bairro, condominioResultado.Bairro);
             Assert.Equal(condominioResultadoEsperado.Cidade, condominioResultado.Cidade);
-            Assert.Equal(condominioResultadoEsperado.Estado, condominioResultado.Estado);
+            Assert.Equal(condominioResultadoEsperado.Estado.Identificador, condominioResultado.Estado.Identificador);
+            Assert.Equal(condominioResultadoEsperado.Estado.Nome, condominioResultado.Estado.Nome);
+            Assert.Equal(condominioResultadoEsperado.Estado.Sigla, condominioResultado.Estado.Sigla);
             Assert.Equal(condominioResultadoEsperado.Pais, condominioResultado.Pais);
         }
 
@@ -132,7 +156,7 @@ namespace Condominio.Application.Tests
         public async Task BuscarCondominioAsync_Exception()
         {
             //Arange = inicializacao de variaveis 
-            var cpfCnpj = 99999999999999;
+            var cpfCnpj = "99999999999999";
             var parametroCondominioMock = new CondominioParametro()
             {
                 CpfCnpj = cpfCnpj
@@ -155,7 +179,12 @@ namespace Condominio.Application.Tests
                 Numero = "121A",
                 Bairro = "Citrolandia",
                 Cidade = "Betim",
-                Estado = Estado.MG,
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
                 Pais = "Brasil"
             };
 
@@ -170,7 +199,12 @@ namespace Condominio.Application.Tests
                 Numero = "121A",
                 Bairro = "Citrolandia",
                 Cidade = "Betim",
-                Estado = Estado.MG,
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
                 Pais = "Brasil"
             };
 
@@ -217,7 +251,7 @@ namespace Condominio.Application.Tests
         public async Task BuscarMoradiaCondominiosAsync_Sucesso()
         {
             //Arange = inicializacao de variaveis 
-            var cpfCnpj = 99999999999999;
+            var cpfCnpj = "99999999999999";
 
             var identificador = Guid.NewGuid();
 
@@ -234,7 +268,12 @@ namespace Condominio.Application.Tests
                     Numero = "121A",
                     Bairro = "Citrolandia",
                     Cidade = "Betim",
-                    Estado = Estado.MG,
+                    Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
                     Pais = "Brasil"
                 }
             };
@@ -250,7 +289,12 @@ namespace Condominio.Application.Tests
                 Numero = "121A",
                 Bairro = "Citrolandia",
                 Cidade = "Betim",
-                Estado = Estado.MG,
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
                 Pais = "Brasil"
             };
             //Act = invocar os metodos 
@@ -276,7 +320,9 @@ namespace Condominio.Application.Tests
                     Assert.Equal(condominioResultadoEsperado.Numero, item1.Numero);
                     Assert.Equal(condominioResultadoEsperado.Bairro, item1.Bairro);
                     Assert.Equal(condominioResultadoEsperado.Cidade, item1.Cidade);
-                    Assert.Equal(condominioResultadoEsperado.Estado, item1.Estado);
+                    Assert.Equal(condominioResultadoEsperado.Estado.Identificador, item1.Estado.Identificador);
+                    Assert.Equal(condominioResultadoEsperado.Estado.Nome, item1.Estado.Nome);
+                    Assert.Equal(condominioResultadoEsperado.Estado.Sigla, item1.Estado.Sigla);
                     Assert.Equal(condominioResultadoEsperado.Pais, item1.Pais);
                 });
 
@@ -289,7 +335,7 @@ namespace Condominio.Application.Tests
         {
             //Arange = inicializacao de variaveis 
             var cpfCnpj = 99999999999999;
-          
+
             var exceptionMock = new Exception("Erro ao recuperar dados");
             var exceptionEsperado = new Exception("Erro ao recuperar dados");
 

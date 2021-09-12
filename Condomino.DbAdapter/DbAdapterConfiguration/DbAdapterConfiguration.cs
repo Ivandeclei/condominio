@@ -2,6 +2,6 @@
 {
     public class DbAdapterConfiguration
     {
-        public string ConnectionString { get; set; }
+        public string ConnectionString { get; set; } 
     }
 }

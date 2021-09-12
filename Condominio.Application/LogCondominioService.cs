@@ -3,7 +3,6 @@ using Condominio.Domain.Models;
 using Condominio.Domain.Services;
 using Newtonsoft.Json;
 using System;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Condominio.Application
@@ -39,9 +38,7 @@ namespace Condominio.Application
 
             };
 
-
             await logCondominioAdapter.InserirLogCondominioAsync(logCondominio);
-            
         }
     }
 }

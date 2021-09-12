@@ -10,7 +10,7 @@ namespace Condominio.Application.Microsoft.Extensions.DependencyInjection
 {
     public static class DbRepositoryServiceCollectionExtensions
     {
-        public static IServiceCollection AddApplication( this IServiceCollection services,
+        public static IServiceCollection AddDbAdapter( this IServiceCollection services,
             DbAdapterConfiguration dbAdapterConfiguration)
         {
             if (services == null)
@@ -24,12 +24,13 @@ namespace Condominio.Application.Microsoft.Extensions.DependencyInjection
             }
 
             services.AddSingleton(dbAdapterConfiguration);
-
+           
             services.AddScoped<IDbConnection>( d => {
                 return new SqlConnection(dbAdapterConfiguration.ConnectionString);
             });
 
             services.AddScoped<ICondominioReadAdapter, CondominioReadAdapter>();
+            services.AddScoped<ILogCondominioWriteAdapter, LogCondominioWriteAdapter>();
 
             return services;
 

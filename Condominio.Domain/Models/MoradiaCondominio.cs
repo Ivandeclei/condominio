@@ -11,8 +11,8 @@ namespace Condominio.Domain.Models
         public string Nome { get; set; }
 
         [Required(ErrorMessage = " O CNPJ ou CPF é obrigatório")]
-        [MaxLength(14, ErrorMessage = "O valor informado excedeu o maximo permitido {1}")]
-        public long CpfCnpj { get; set; }
+        [MaxLength(14, ErrorMessage = "O valor informado excedeu o maxímo permitido {1}")]
+        public string CpfCnpj { get; set; }
 
         [Required(ErrorMessage = "O Telefone é Obrigatório")]
         public string Telefone { get; set; }
