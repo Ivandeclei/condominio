@@ -13,19 +13,24 @@ namespace Condominio.Application
         private readonly ICondominioReadAdapter dbCondominioReadAdapter;
         private readonly ILogCondominioService logCondominioService;
         private readonly ILogger logger;
+        private readonly IValidacaoCondominioParametroService validacaoCondominioParametroService;
 
         public CondominioService(ICondominioReadAdapter dbCondominioReadAdapter,
             ILogCondominioService logCondominioService,
+            IValidacaoCondominioParametroService validacaoCondominioParametroService,
             ILoggerFactory loggerFactory)
         {
             this.dbCondominioReadAdapter = dbCondominioReadAdapter ??
                 throw new ArgumentNullException(nameof(dbCondominioReadAdapter));
             this.logCondominioService = logCondominioService ??
                 throw new ArgumentNullException(nameof(logCondominioService));
+            this.validacaoCondominioParametroService = validacaoCondominioParametroService ??
+                throw new ArgumentNullException(nameof(validacaoCondominioParametroService));
             this.logger = loggerFactory.CreateLogger<CondominioService>() ??
                 throw new ArgumentNullException(nameof(loggerFactory));
         }
-        public async Task<MoradiaCondominio> BuscarMoradiaCondominioAsync(CondominioParametro condominioParametro)
+        public async Task<MoradiaCondominio> BuscarMoradiaCondominioAsync(
+            CondominioParametro condominioParametro)
         {
             logger.LogInformation("Realizando chamada ao metodo" + 
                 nameof(BuscarMoradiaCondominioAsync));
@@ -33,6 +38,8 @@ namespace Condominio.Application
             {
                 throw new ArgumentNullException(nameof(condominioParametro));
             }
+
+            validacaoCondominioParametroService.ValidacaoCondominioParametro(condominioParametro);
 
             try
             {
@@ -46,7 +53,8 @@ namespace Condominio.Application
                 await logCondominioService.GerarLogPorMetodoAsync(e, 
                     nameof(ICondominioReadAdapter.BuscarMoradiaCondominioAsync));
 
-                logger.LogInformation("Falha na chamada do metodo" + nameof(BuscarMoradiaCondominioAsync));
+                logger.LogInformation("Falha na chamada do metodo" + nameof(
+                    BuscarMoradiaCondominioAsync));
 
                 throw;
             }

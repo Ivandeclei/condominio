@@ -6,23 +6,17 @@ namespace Condominio.Application.Microsoft.Extensions.DependencyInjection
 {
     public static class ApplicationServiceCollectionExtensions
     {
-        public static IServiceCollection AddApplication( this IServiceCollection services,
-            ApplicationConfiguration applicationConfiguration )
+        public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             if (services == null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            if (applicationConfiguration == null)
-            {
-                throw new ArgumentNullException(nameof(applicationConfiguration));
-            }
-
-            services.AddSingleton(applicationConfiguration);
-
             services.AddScoped<ICondominioService, CondominioService>();
             services.AddScoped<ILogCondominioService, LogCondominioService>();
+            services.AddScoped<IValidacaoBaseService, ValidacaoBaseService>();
+            services.AddScoped<IValidacaoCondominioParametroService, ValidacaoCondominioParametroService>();
 
             return services;
 
