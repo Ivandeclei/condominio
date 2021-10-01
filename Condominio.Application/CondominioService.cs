@@ -14,11 +14,15 @@ namespace Condominio.Application
         private readonly ILogCondominioService logCondominioService;
         private readonly ILogger logger;
         private readonly IValidacaoCondominioParametroService validacaoCondominioParametroService;
+        private readonly IValidacaoCondominioService validacaoCondominioService;
+        private readonly ICondominioWriteAdapter dbCondominioWriteAdapter;
 
         public CondominioService(ICondominioReadAdapter dbCondominioReadAdapter,
+            ICondominioWriteAdapter dbCondominioWriteAdapter,
             ILogCondominioService logCondominioService,
             IValidacaoCondominioParametroService validacaoCondominioParametroService,
-            ILoggerFactory loggerFactory)
+            IValidacaoCondominioService validacaoCondominioService,
+        ILoggerFactory loggerFactory)
         {
             this.dbCondominioReadAdapter = dbCondominioReadAdapter ??
                 throw new ArgumentNullException(nameof(dbCondominioReadAdapter));
@@ -28,7 +32,12 @@ namespace Condominio.Application
                 throw new ArgumentNullException(nameof(validacaoCondominioParametroService));
             this.logger = loggerFactory.CreateLogger<CondominioService>() ??
                 throw new ArgumentNullException(nameof(loggerFactory));
+            this.dbCondominioWriteAdapter = dbCondominioWriteAdapter ??
+                throw new ArgumentNullException(nameof(dbCondominioWriteAdapter));
+            this.validacaoCondominioService = validacaoCondominioService ??
+                throw new ArgumentNullException(nameof(validacaoCondominioService));
         }
+
         public async Task<MoradiaCondominio> BuscarMoradiaCondominioAsync(
             CondominioParametro condominioParametro)
         {
@@ -79,5 +88,64 @@ namespace Condominio.Application
                 throw;
             }
         }
+
+        public async Task SalvarCondominioAsync(MoradiaCondominio moradiaCondominio)
+        {
+            logger.LogInformation("Realiza chamada ao metodo" + nameof(SalvarCondominioAsync));
+
+            if(moradiaCondominio is null)
+            {
+                throw new ArgumentNullException(nameof(moradiaCondominio));
+            }
+
+            validacaoCondominioService.ValidarCondominio(moradiaCondominio);
+
+            try
+            {
+                await dbCondominioWriteAdapter.SalvarCondominioAsync(moradiaCondominio);
+
+            }
+            catch (Exception e)
+            {
+
+                await logCondominioService.GerarLogPorMetodoAsync(e , 
+                    nameof(ICondominioWriteAdapter.SalvarCondominioAsync));
+
+                logger.LogInformation("Falha na chamada do metodo" + nameof(
+                    SalvarCondominioAsync));
+
+                throw;
+            }
+        }
+
+        public async Task<MoradiaCondominio> AtualizarCondominioAsync(MoradiaCondominio moradiaCondominio)
+        {
+            logger.LogInformation("Realiza chamada ao metodo" + nameof(AtualizarCondominioAsync));
+
+            if(moradiaCondominio is null)
+            {
+                throw new ArgumentNullException(nameof(moradiaCondominio));
+            }
+
+            validacaoCondominioService.ValidarCondominio(moradiaCondominio);
+
+            try
+            {
+                var resultado = await dbCondominioWriteAdapter.AtualizarCondominioAsync(moradiaCondominio);
+                return resultado;
+            }
+            catch (Exception e)
+            {
+
+                await logCondominioService.GerarLogPorMetodoAsync(e,
+                    nameof(ICondominioWriteAdapter.AtualizarCondominioAsync));
+
+                logger.LogInformation("Falha na chamada do metodo" + nameof(
+                    AtualizarCondominioAsync));
+
+                throw;
+            }
+        }
+
     }
 }

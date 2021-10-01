@@ -17,16 +17,22 @@ namespace Condominio.Application.Tests
         private readonly Mock<IValidacaoCondominioParametroService> validacaoCondominioParametroServiceMock;
         private readonly Mock<ILogCondominioService> logCondominioServiceMock;
         private readonly Mock<ICondominioReadAdapter> condominioReadAdapterMock;
+        private readonly Mock<ICondominioWriteAdapter> condominioWriteAdapterMock;
+        private readonly Mock<IValidacaoCondominioService> validacaoCondominioServiceMock;
         public CondominioServiceTests()
         {
             logCondominioServiceMock = new Mock<ILogCondominioService>();
             condominioReadAdapterMock = new Mock<ICondominioReadAdapter>();
             validacaoCondominioParametroServiceMock = new Mock<IValidacaoCondominioParametroService>();
+            condominioWriteAdapterMock = new Mock<ICondominioWriteAdapter>();
+            validacaoCondominioServiceMock = new Mock<IValidacaoCondominioService>();
 
             condominioService = new CondominioService(
                 condominioReadAdapterMock.Object,
+                condominioWriteAdapterMock.Object,
                 logCondominioServiceMock.Object,
                 validacaoCondominioParametroServiceMock.Object,
+                validacaoCondominioServiceMock.Object,
                 new LoggerFactory()
             );
         }
@@ -367,6 +373,407 @@ namespace Condominio.Application.Tests
                 });
 
         }
+
+        [Fact]
+        [Trait(nameof(ICondominioService.SalvarCondominioAsync), "Sucesso")]
+
+        public async Task SalvarCondominioAsync_Sucesso()
+        {
+            //Arrange - inicializaçãod evariaveis 
+            var identificador = Guid.NewGuid();
+            var cpfCnpj = "99999999999999";
+            var condominioMock = new MoradiaCondominio()
+            {
+                Nome = "Condominio A",
+                Identificador = identificador,
+                CpfCnpj = cpfCnpj,
+                Telefone = "31993584778",
+                Cep = 31111111,
+                Rua = "barao verde",
+                Numero = "121A",
+                Bairro = "Citrolandia",
+                Cidade = "Betim",
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
+                Pais = "Brasil"
+            };
+
+            var condominioEsperado = new MoradiaCondominio()
+            {
+                Nome = "Condominio A",
+                Identificador = identificador,
+                CpfCnpj = cpfCnpj,
+                Telefone = "31993584778",
+                Cep = 31111111,
+                Rua = "barao verde",
+                Numero = "121A",
+                Bairro = "Citrolandia",
+                Cidade = "Betim",
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
+                Pais = "Brasil"
+            };
+
+
+            //Act = invocar os metodos 
+            condominioWriteAdapterMock.Setup(c => c.SalvarCondominioAsync(It.IsAny<MoradiaCondominio>()))
+                .Callback<MoradiaCondominio>(moradiaCondominioCallback =>
+                {
+
+                    Assert.Equal(moradiaCondominioCallback.Bairro, condominioEsperado.Bairro);
+                    Assert.Equal(moradiaCondominioCallback.Cep, condominioEsperado.Cep);
+                    Assert.Equal(moradiaCondominioCallback.Cidade, condominioEsperado.Cidade);
+                    Assert.Equal(moradiaCondominioCallback.CpfCnpj, condominioEsperado.CpfCnpj);
+                    Assert.Equal(moradiaCondominioCallback.Estado.Nome, condominioEsperado.Estado.Nome);
+                    Assert.Equal(moradiaCondominioCallback.Estado.Sigla, condominioEsperado.Estado.Sigla);
+                    Assert.Equal(moradiaCondominioCallback.Nome, condominioEsperado.Nome);
+                    Assert.Equal(moradiaCondominioCallback.Numero, condominioEsperado.Numero);
+                    Assert.Equal(moradiaCondominioCallback.Pais, condominioEsperado.Pais);
+                    Assert.Equal(moradiaCondominioCallback.Rua, condominioEsperado.Rua);
+                    Assert.Equal(moradiaCondominioCallback.Telefone, condominioEsperado.Telefone);
+
+                })
+                .Returns(Task.CompletedTask);
+
+            await condominioService.SalvarCondominioAsync(condominioMock);
+            //Assertes = verifica a ação
+        }
+
+        [Fact]
+        [Trait(nameof(ICondominioService.SalvarCondominioAsync), "Exception")]
+        public async Task SalvarCondominioAsync_Exception()
+        {
+            //Arrange - inicializaçãod evariaveis 
+            var identificador = Guid.NewGuid();
+            var cpfCnpj = "99999999999999";
+            var condominioMock = new MoradiaCondominio()
+            {
+                Nome = "Condominio A",
+                Identificador = identificador,
+                CpfCnpj = cpfCnpj,
+                Telefone = "31993584778",
+                Cep = 31111111,
+                Rua = "barao verde",
+                Numero = "121A",
+                Bairro = "Citrolandia",
+                Cidade = "Betim",
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
+                Pais = "Brasil"
+            };
+
+            var condominioEsperado = new MoradiaCondominio()
+            {
+                Nome = "Condominio A",
+                Identificador = identificador,
+                CpfCnpj = cpfCnpj,
+                Telefone = "31993584778",
+                Cep = 31111111,
+                Rua = "barao verde",
+                Numero = "121A",
+                Bairro = "Citrolandia",
+                Cidade = "Betim",
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
+                Pais = "Brasil"
+            };
+
+            var exceptionMock = new Exception("Erro ao recuperar dados");
+            var exceptionEsperado = new Exception("Erro ao recuperar dados");
+
+            var nomeMetodo = nameof(ICondominioService.SalvarCondominioAsync);
+
+            //Act = invocar os metodos 
+            condominioWriteAdapterMock.Setup(c => c.SalvarCondominioAsync(It.IsAny<MoradiaCondominio>()))
+                .Callback<MoradiaCondominio>(moradiaCondominioCallback =>
+                {
+
+                    Assert.Equal(moradiaCondominioCallback.Bairro, condominioEsperado.Bairro);
+                    Assert.Equal(moradiaCondominioCallback.Cep, condominioEsperado.Cep);
+                    Assert.Equal(moradiaCondominioCallback.Cidade, condominioEsperado.Cidade);
+                    Assert.Equal(moradiaCondominioCallback.CpfCnpj, condominioEsperado.CpfCnpj);
+                    Assert.Equal(moradiaCondominioCallback.Estado.Nome, condominioEsperado.Estado.Nome);
+                    Assert.Equal(moradiaCondominioCallback.Estado.Sigla, condominioEsperado.Estado.Sigla);
+                    Assert.Equal(moradiaCondominioCallback.Nome, condominioEsperado.Nome);
+                    Assert.Equal(moradiaCondominioCallback.Numero, condominioEsperado.Numero);
+                    Assert.Equal(moradiaCondominioCallback.Pais, condominioEsperado.Pais);
+                    Assert.Equal(moradiaCondominioCallback.Rua, condominioEsperado.Rua);
+                    Assert.Equal(moradiaCondominioCallback.Telefone, condominioEsperado.Telefone);
+
+                })
+                .ThrowsAsync(exceptionMock);
+
+
+            //Realiza chamada ao metodo
+
+            var ex = await Assert.ThrowsAnyAsync<Exception>(async () =>
+            {
+                await condominioService
+               .SalvarCondominioAsync(condominioMock);
+            });
+
+            //Assertes = verifica a ação
+
+            Assert.Equal(exceptionEsperado.Message, ex.Message);
+
+            logCondominioServiceMock.Setup(a => a.GerarLogPorMetodoAsync(It.IsAny<Exception>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask)
+                .Callback<Exception, string>((exceptionCallback, metodoCallback) =>
+                {
+                    Assert.Equal(exceptionEsperado.Message, exceptionCallback.Message);
+                    Assert.Equal(nomeMetodo, metodoCallback);
+                });
+
+        }
+
+        [Fact]
+        [Trait(nameof(ICondominioService.SalvarCondominioAsync), "ArgumentException")]
+        public async Task SalvarCondominioAsync_ArgumentException()
+        {
+            //Arange = inicializacao de variaveis 
+
+            MoradiaCondominio moradiaCondominio = null;
+            var parametroCondominioEsperado = "moradiaCondominio";
+            var mensagemEsperada = "Value cannot be null.";
+
+
+            //Act = invocar os metodos 
+
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            {
+                await condominioService.SalvarCondominioAsync(moradiaCondominio);
+            });
+
+            //Assertes = verifica a ação
+
+            Assert.Equal(parametroCondominioEsperado, ex.ParamName);
+            Assert.Contains(mensagemEsperada, ex.Message);
+
+        }
+
+
+        [Fact]
+        [Trait(nameof(ICondominioService.AtualizarCondominioAsync), "Sucesso")]
+
+        public async Task AtualizarCondominioAsync_Sucesso()
+        {
+            //Arrange - inicializaçãod evariaveis 
+            var identificador = Guid.NewGuid();
+            var cpfCnpj = "99999999999999";
+            var condominioMock = new MoradiaCondominio()
+            {
+                Nome = "Condominio A",
+                Identificador = identificador,
+                CpfCnpj = cpfCnpj,
+                Telefone = "31993584778",
+                Cep = 31111111,
+                Rua = "barao verde",
+                Numero = "121A",
+                Bairro = "Citrolandia",
+                Cidade = "Betim",
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
+                Pais = "Brasil"
+            };
+
+            var condominioEsperado = new MoradiaCondominio()
+            {
+                Nome = "Condominio A",
+                Identificador = identificador,
+                CpfCnpj = cpfCnpj,
+                Telefone = "31993584778",
+                Cep = 31111111,
+                Rua = "barao verde",
+                Numero = "121A",
+                Bairro = "Citrolandia",
+                Cidade = "Betim",
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
+                Pais = "Brasil"
+            };
+
+
+            //Act = invocar os metodos 
+            condominioWriteAdapterMock.Setup(c => c.AtualizarCondominioAsync(It.IsAny<MoradiaCondominio>()))
+                .Callback<MoradiaCondominio>(moradiaCondominioCallback =>
+                {
+
+                    Assert.Equal(moradiaCondominioCallback.Bairro, condominioEsperado.Bairro);
+                    Assert.Equal(moradiaCondominioCallback.Cep, condominioEsperado.Cep);
+                    Assert.Equal(moradiaCondominioCallback.Cidade, condominioEsperado.Cidade);
+                    Assert.Equal(moradiaCondominioCallback.CpfCnpj, condominioEsperado.CpfCnpj);
+                    Assert.Equal(moradiaCondominioCallback.Estado.Nome, condominioEsperado.Estado.Nome);
+                    Assert.Equal(moradiaCondominioCallback.Estado.Sigla, condominioEsperado.Estado.Sigla);
+                    Assert.Equal(moradiaCondominioCallback.Nome, condominioEsperado.Nome);
+                    Assert.Equal(moradiaCondominioCallback.Numero, condominioEsperado.Numero);
+                    Assert.Equal(moradiaCondominioCallback.Pais, condominioEsperado.Pais);
+                    Assert.Equal(moradiaCondominioCallback.Rua, condominioEsperado.Rua);
+                    Assert.Equal(moradiaCondominioCallback.Telefone, condominioEsperado.Telefone);
+
+                })
+                .ReturnsAsync(condominioMock);
+
+            var resultado = await condominioService.AtualizarCondominioAsync(condominioMock);
+
+            Assert.Equal(resultado.Identificador, condominioEsperado.Identificador);
+            Assert.Equal(resultado.Bairro, condominioEsperado.Bairro);
+            Assert.Equal(resultado.Cep, condominioEsperado.Cep);
+            Assert.Equal(resultado.Cidade, condominioEsperado.Cidade);
+            Assert.Equal(resultado.CpfCnpj, condominioEsperado.CpfCnpj);
+            Assert.Equal(resultado.Estado.Nome, condominioEsperado.Estado.Nome);
+            Assert.Equal(resultado.Estado.Sigla, condominioEsperado.Estado.Sigla);
+            Assert.Equal(resultado.Nome, condominioEsperado.Nome);
+            Assert.Equal(resultado.Numero, condominioEsperado.Numero);
+            Assert.Equal(resultado.Pais, condominioEsperado.Pais);
+            Assert.Equal(resultado.Rua, condominioEsperado.Rua);
+            Assert.Equal(resultado.Telefone, condominioEsperado.Telefone);
+            //Assertes = verifica a ação
+        }
+
+        [Fact]
+        [Trait(nameof(ICondominioService.AtualizarCondominioAsync), "Exception")]
+        public async Task AtualizarCondominioAsync_Exception()
+        {
+            //Arrange - inicializaçãod evariaveis 
+            var identificador = Guid.NewGuid();
+            var cpfCnpj = "99999999999999";
+            var condominioMock = new MoradiaCondominio()
+            {
+                Nome = "Condominio A",
+                Identificador = identificador,
+                CpfCnpj = cpfCnpj,
+                Telefone = "31993584778",
+                Cep = 31111111,
+                Rua = "barao verde",
+                Numero = "121A",
+                Bairro = "Citrolandia",
+                Cidade = "Betim",
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
+                Pais = "Brasil"
+            };
+
+            var condominioEsperado = new MoradiaCondominio()
+            {
+                Nome = "Condominio A",
+                Identificador = identificador,
+                CpfCnpj = cpfCnpj,
+                Telefone = "31993584778",
+                Cep = 31111111,
+                Rua = "barao verde",
+                Numero = "121A",
+                Bairro = "Citrolandia",
+                Cidade = "Betim",
+                Estado = new Estado
+                {
+                    Identificador = identificador,
+                    Nome = "Minas Gerais",
+                    Sigla = "MG"
+                },
+                Pais = "Brasil"
+            };
+
+            var exceptionMock = new Exception("Erro ao recuperar dados");
+            var exceptionEsperado = new Exception("Erro ao recuperar dados");
+
+            var nomeMetodo = nameof(ICondominioService.AtualizarCondominioAsync);
+
+            //Act = invocar os metodos 
+            condominioWriteAdapterMock.Setup(c => c.AtualizarCondominioAsync(It.IsAny<MoradiaCondominio>()))
+                .Callback<MoradiaCondominio>(moradiaCondominioCallback =>
+                {
+
+                    Assert.Equal(moradiaCondominioCallback.Bairro, condominioEsperado.Bairro);
+                    Assert.Equal(moradiaCondominioCallback.Cep, condominioEsperado.Cep);
+                    Assert.Equal(moradiaCondominioCallback.Cidade, condominioEsperado.Cidade);
+                    Assert.Equal(moradiaCondominioCallback.CpfCnpj, condominioEsperado.CpfCnpj);
+                    Assert.Equal(moradiaCondominioCallback.Estado.Nome, condominioEsperado.Estado.Nome);
+                    Assert.Equal(moradiaCondominioCallback.Estado.Sigla, condominioEsperado.Estado.Sigla);
+                    Assert.Equal(moradiaCondominioCallback.Nome, condominioEsperado.Nome);
+                    Assert.Equal(moradiaCondominioCallback.Numero, condominioEsperado.Numero);
+                    Assert.Equal(moradiaCondominioCallback.Pais, condominioEsperado.Pais);
+                    Assert.Equal(moradiaCondominioCallback.Rua, condominioEsperado.Rua);
+                    Assert.Equal(moradiaCondominioCallback.Telefone, condominioEsperado.Telefone);
+
+                })
+                .ThrowsAsync(exceptionMock);
+
+
+            //Realiza chamada ao metodo
+
+            var ex = await Assert.ThrowsAnyAsync<Exception>(async () =>
+            {
+                await condominioService
+               .AtualizarCondominioAsync(condominioMock);
+            });
+
+            //Assertes = verifica a ação
+
+            Assert.Equal(exceptionEsperado.Message, ex.Message);
+
+            logCondominioServiceMock.Setup(a => a.GerarLogPorMetodoAsync(It.IsAny<Exception>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask)
+                .Callback<Exception, string>((exceptionCallback, metodoCallback) =>
+                {
+                    Assert.Equal(exceptionEsperado.Message, exceptionCallback.Message);
+                    Assert.Equal(nomeMetodo, metodoCallback);
+                });
+
+        }
+
+        [Fact]
+        [Trait(nameof(ICondominioService.AtualizarCondominioAsync), "ArgumentException")]
+        public async Task AtualizarCondominioAsync_ArgumentException()
+        {
+            //Arange = inicializacao de variaveis 
+
+            MoradiaCondominio moradiaCondominio = null;
+            var parametroCondominioEsperado = "moradiaCondominio";
+            var mensagemEsperada = "Value cannot be null.";
+
+
+            //Act = invocar os metodos 
+
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            {
+                await condominioService.AtualizarCondominioAsync(moradiaCondominio);
+            });
+
+            //Assertes = verifica a ação
+
+            Assert.Equal(parametroCondominioEsperado, ex.ParamName);
+            Assert.Contains(mensagemEsperada, ex.Message);
+
+        }
+
     }
 
 
