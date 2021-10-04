@@ -31,6 +31,7 @@ namespace Condominio.Application.Microsoft.Extensions.DependencyInjection
 
             services.AddScoped<ICondominioReadAdapter, CondominioReadAdapter>();
             services.AddScoped<ILogCondominioWriteAdapter, LogCondominioWriteAdapter>();
+            services.AddScoped<ICondominioWriteAdapter, CondominioWriteAdapter>();
 
             return services;
 

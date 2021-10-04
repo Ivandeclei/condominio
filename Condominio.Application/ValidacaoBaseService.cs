@@ -29,6 +29,11 @@ namespace Condominio.Application
                     });
                 }
 
+                if (coreException.Errors.Any())
+                {
+                    throw CoreException.Exception(coreException.Errors.ToList());
+                }
+                
                 return coreException;
             }
 

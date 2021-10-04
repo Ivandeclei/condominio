@@ -9,7 +9,7 @@ namespace Condominio.Domain.Models
 
         [Required(ErrorMessage = "O CEP é obrigatório")]
         [Range(1, 99999999)]
-        public int? Cep { get; set; }
+        public int Cep { get; set; }
 
         public string Numero { get; set; }
 
@@ -19,8 +19,6 @@ namespace Condominio.Domain.Models
         [Required(ErrorMessage = "O Cidade é obrigatório")]
         public string Cidade { get; set; }
 
-        [Required(ErrorMessage = "O Estado é obrigatório")]
-        [StringLength(2, ErrorMessage = "O tamanho maximo da sigla do estado é 2 caracteres" )]
         public Estado Estado { get; set; }
         public string? Pais { get; set; }
     }

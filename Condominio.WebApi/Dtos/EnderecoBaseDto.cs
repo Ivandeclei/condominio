@@ -10,7 +10,7 @@
         /// <summary>
         /// CEP
         /// </summary>
-        public int? Cep { get; set; }
+        public int Cep { get; set; }
 
         /// <summary>
         /// Número 
