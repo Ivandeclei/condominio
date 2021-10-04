@@ -19,13 +19,10 @@ namespace Condominio.Application
         {
             var erros = new CoreException();
 
+
             validacaoBaseService.VerificarCamposObrigatorios<MoradiaCondominio>(erros, moradiaCondominio);
             validacaoBaseService.VerificarCamposObrigatorios<Estado>(erros, moradiaCondominio.Estado);
 
-            if(erros.Errors.Any())
-            {
-                throw CoreException.Exception(erros.Errors.ToList());
-            }
         }
     }
 }

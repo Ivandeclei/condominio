@@ -40,10 +40,7 @@ namespace Condominio.WebApi.Controllers
         /// Retorna Condominio pesquisado
         /// </returns>
         [HttpGet("BuscarCondominioPorCNPJ")]
-
         [ProducesResponseType(typeof(MoradiaCondominioDto), 200)]
-        //[ProducesResponseType(typeof(CoreException), 400)]
-        //[ProducesResponseType(typeof(InternalError), 500)]
         public async Task<IActionResult> BuscarCondominioAsync(
             [FromQuery] CondominioParametroGet condominioParametroGet)
         {
@@ -80,8 +77,6 @@ namespace Condominio.WebApi.Controllers
         /// </returns>
         [HttpGet]
         [ProducesResponseType(typeof(MoradiaCondominioDto), 200)]
-        //[ProducesResponseType(typeof(CoreException<CoreError>), 400)]
-        //[ProducesResponseType(typeof(InternalError), 500)]
         public async Task<IActionResult> BuscarCondominiosAsync()
         {
             if (!ModelState.IsValid)
@@ -100,6 +95,72 @@ namespace Condominio.WebApi.Controllers
             catch (ArgumentException e)
             {
 
+                return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Salva um novo resgistro de condominio.
+        /// </summary>
+        /// <param name="moradiaCondominioParametroPost">
+        /// parametros para criar um novo regitro de condominio
+        /// </param>
+        [HttpPost]
+        [ProducesResponseType(typeof(MoradiaCondominioDto), 200)]
+        public async Task<IActionResult> SalvarCondominioAsync(
+            [FromBody] MoradiaCondominioParametroPost moradiaCondominioParametroPost)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var condominioParametro = mapper.Map<MoradiaCondominio>(moradiaCondominioParametroPost);
+                await condominioService.SalvarCondominioAsync(condominioParametro);
+                return Ok();
+            }
+            catch (CoreException e)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest, e.Errors);
+            }
+            catch (Exception e)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Atualiza um registro de condominio
+        /// </summary>
+        /// <param name="moradiaCondominioParametroPost">
+        /// Parametros para atualizar um registro de condominio
+        /// </param>
+        /// <returns></returns>
+        [HttpPut]
+        [ProducesResponseType(typeof(MoradiaCondominioDto), 200)]
+        public async Task<IActionResult> AtualizarCondominioAsync(
+            [FromBody] MoradiaCondominioParametroPost moradiaCondominioParametroPost)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var condominioParametro = mapper.Map<MoradiaCondominio>(moradiaCondominioParametroPost);
+                var resultado = await condominioService.AtualizarCondominioAsync(condominioParametro);
+                var resultadoFinal = mapper.Map<MoradiaCondominioDto>(resultado);
+                return Ok(resultadoFinal);
+            }
+            catch (CoreException e)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest, e.Errors);
+            }
+            catch (Exception e)
+            {
                 return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
             }
         }

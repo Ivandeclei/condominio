@@ -17,6 +17,7 @@ namespace Condominio.Application.Microsoft.Extensions.DependencyInjection
             services.AddScoped<ILogCondominioService, LogCondominioService>();
             services.AddScoped<IValidacaoBaseService, ValidacaoBaseService>();
             services.AddScoped<IValidacaoCondominioParametroService, ValidacaoCondominioParametroService>();
+            services.AddScoped<IValidacaoCondominioService, ValidacaoCondominioService>();
 
             return services;
 
